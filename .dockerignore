@@ -1,0 +1,53 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Environment files
+.env
+.env.local
+.env.example
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+api
+api.exe
+*.exe
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Configuration directories (these are mounted as volumes)
+prometheus/
+grafana/
+alertmanager/
+blackbox/
+
+# Test files
+*_test.go
+test_*.go
+
+# Temporary files
+*.tmp
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Coverage files
+coverage.out
+*.cover

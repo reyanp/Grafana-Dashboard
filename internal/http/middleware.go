@@ -6,6 +6,9 @@ import (
 	"runtime/debug"
 	"time"
 
+	"monitoring-dashboard-automation/internal/metrics"
+
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 )
@@ -91,4 +94,99 @@ func PanicRecoveryMiddleware(logger *zap.Logger) func(next http.Handler) http.Ha
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// PrometheusMiddleware instruments HTTP requests with Prometheus metrics
+func PrometheusMiddleware(metricsRegistry *metrics.Registry) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			
+			// Create a response writer wrapper to capture status code
+			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+			
+			// Process the request
+			next.ServeHTTP(ww, r)
+			
+			// Record metrics after request completion
+			duration := time.Since(start)
+			
+			// Get the route pattern from chi router context
+			route := getRoutePattern(r)
+			
+			// Record the HTTP request metrics
+			metricsRegistry.RecordHTTPRequest(r.Method, route, ww.Status(), duration)
+		})
+	}
+}
+
+// BearerTokenAuthMiddleware validates bearer token for admin routes
+func BearerTokenAuthMiddleware(adminToken string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Get Authorization header
+			authHeader := r.Header.Get("Authorization")
+			if authHeader == "" {
+				http.Error(w, "Authorization header required", http.StatusUnauthorized)
+				return
+			}
+			
+			// Check if it starts with "Bearer "
+			const bearerPrefix = "Bearer "
+			if len(authHeader) < len(bearerPrefix) || authHeader[:len(bearerPrefix)] != bearerPrefix {
+				http.Error(w, "Invalid authorization format. Expected 'Bearer <token>'", http.StatusUnauthorized)
+				return
+			}
+			
+			// Extract token
+			token := authHeader[len(bearerPrefix):]
+			if token != adminToken {
+				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				return
+			}
+			
+			// Token is valid, proceed to next handler
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// ErrorInjectionMiddleware injects errors based on toggle configuration
+func ErrorInjectionMiddleware(errorToggle interface{}) func(next http.Handler) http.Handler {
+	// Type assertion to get the actual ErrorToggle
+	toggle, ok := errorToggle.(interface {
+		ShouldInjectError() (bool, int)
+	})
+	if !ok {
+		// If type assertion fails, return a no-op middleware
+		return func(next http.Handler) http.Handler {
+			return next
+		}
+	}
+	
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Check if we should inject an error
+			if shouldInject, statusCode := toggle.ShouldInjectError(); shouldInject {
+				http.Error(w, "Injected error for testing", statusCode)
+				return
+			}
+			
+			// No error injection, proceed normally
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// getRoutePattern extracts the route pattern from chi router context
+func getRoutePattern(r *http.Request) string {
+	// Try to get the route pattern from chi context
+	if rctx := chi.RouteContext(r.Context()); rctx != nil {
+		if rctx.RoutePattern() != "" {
+			return rctx.RoutePattern()
+		}
+	}
+	
+	// Fallback to the request path if no pattern is found
+	return r.URL.Path
 }

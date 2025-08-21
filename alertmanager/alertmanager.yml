@@ -1,0 +1,107 @@
+global:
+  # Global configuration for AlertManager
+  resolve_timeout: 5m
+
+# Routing configuration
+route:
+  group_by: ['alertname', 'instance']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default'
+  routes:
+    # Route critical alerts to both Slack and Discord
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      repeat_interval: 1h
+    # Route warning alerts to default receiver
+    - match:
+        severity: warning
+      receiver: 'default'
+
+# Receiver configurations
+receivers:
+  - name: 'default'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#monitoring'
+        username: 'AlertManager'
+        icon_emoji: ':warning:'
+        title: 'Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Instance:* {{ .Labels.instance }}
+          *Severity:* {{ .Labels.severity }}
+          *Status:* {{ .Status }}
+          {{ if .Labels.job }}*Job:* {{ .Labels.job }}{{ end }}
+          {{ end }}
+        send_resolved: true
+        title_link: 'http://localhost:9090/alerts'
+    discord_configs:
+      - webhook_url: '${DISCORD_WEBHOOK_URL}'
+        username: 'AlertManager'
+        title: 'Alert: {{ .GroupLabels.alertname }}'
+        message: |
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Instance:** {{ .Labels.instance }}
+          **Severity:** {{ .Labels.severity }}
+          **Status:** {{ .Status }}
+          {{ if .Labels.job }}**Job:** {{ .Labels.job }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+  - name: 'critical-alerts'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#alerts-critical'
+        username: 'AlertManager'
+        icon_emoji: ':rotating_light:'
+        title: 'CRITICAL ALERT: {{ .GroupLabels.alertname }}'
+        text: |
+          :rotating_light: *CRITICAL ALERT* :rotating_light:
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Instance:* {{ .Labels.instance }}
+          *Severity:* {{ .Labels.severity }}
+          *Status:* {{ .Status }}
+          {{ if .Labels.job }}*Job:* {{ .Labels.job }}{{ end }}
+          *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          {{ end }}
+        send_resolved: true
+        title_link: 'http://localhost:9090/alerts'
+    discord_configs:
+      - webhook_url: '${DISCORD_WEBHOOK_URL}'
+        username: 'AlertManager'
+        title: '🚨 CRITICAL ALERT: {{ .GroupLabels.alertname }}'
+        message: |
+          🚨 **CRITICAL ALERT** 🚨
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Instance:** {{ .Labels.instance }}
+          **Severity:** {{ .Labels.severity }}
+          **Status:** {{ .Status }}
+          {{ if .Labels.job }}**Job:** {{ .Labels.job }}{{ end }}
+          **Time:** {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          {{ end }}
+        send_resolved: true
+
+# Inhibition rules to prevent alert spam
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+  - source_match:
+      alertname: 'InstanceDown'
+    target_match_re:
+      alertname: '(HighErrorRate|HighLatencyP95|UptimeProbeFail)'
+    equal: ['instance']

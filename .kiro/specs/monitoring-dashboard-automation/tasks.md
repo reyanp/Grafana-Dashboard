@@ -23,14 +23,28 @@
   - Implement panic recovery middleware with stack trace logging
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 3. Create health check endpoints
+- [x] 3. Create health check endpoints
+
+
+
+
+
+
+
+
+
   - Implement GET /healthz endpoint that always returns 200 OK
   - Implement GET /readyz endpoint with dependency health checks
   - Create health check logic that can be toggled for testing
   - Write unit tests for health check endpoints
   - _Requirements: 1.1, 1.2_
 
-- [ ] 4. Implement Prometheus metrics instrumentation
+- [x] 4. Implement Prometheus metrics instrumentation
+
+
+
+
+
   - Set up prometheus client_golang with custom registry
   - Create middleware for automatic HTTP request instrumentation
   - Implement http_requests_total counter with route, method, status labels
@@ -39,7 +53,17 @@
   - Create GET /metrics endpoint that serves Prometheus format
   - _Requirements: 1.6, 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 5. Create API endpoints with work simulation
+- [x] 5. Create API endpoints with work simulation
+
+
+
+
+
+
+
+
+
+
   - Implement GET /api/v1/ping endpoint with basic response
   - Implement GET /api/v1/work endpoint with ms and jitter parameters
   - Add work simulation logic that respects context cancellation
@@ -48,7 +72,12 @@
   - Write unit tests for API endpoints and work simulation
   - _Requirements: 1.4, 1.5, 2.6, 2.7_
 
-- [ ] 6. Implement error injection system
+- [x] 6. Implement error injection system
+
+
+
+
+
   - Create error toggle data structure with rate and status code configuration
   - Implement POST /api/v1/toggles/error-rate endpoint with bearer token auth
   - Create middleware that injects errors based on toggle configuration
@@ -56,21 +85,37 @@
   - Write unit tests for error injection and authentication
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 7. Create Docker Compose infrastructure
+- [x] 7. Create Docker Compose infrastructure
+
+
+
+
+
+
   - Write docker-compose.yml with all required services (go-app, prometheus, grafana, alertmanager, node_exporter, blackbox_exporter)
   - Create Dockerfile for Go application with multi-stage build
   - Configure service networking and port mappings
   - Set up volume mounts for configuration files
   - _Requirements: 4.1_
 
-- [ ] 8. Configure Prometheus scraping and alerting
+- [x] 8. Configure Prometheus scraping and alerting
+
+
+
+
+
   - Create prometheus/prometheus.yml with scrape configurations for all services
   - Implement scrape configs for go-app, node_exporter, and blackbox_exporter with 5-second intervals
   - Create prometheus/alerts.yml with all required alert rules
   - Implement InstanceDown, HighErrorRate, HighLatencyP95, and UptimeProbeFail alert rules
   - _Requirements: 4.2, 4.3, 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 9. Configure AlertManager for webhook notifications
+- [x] 9. Configure AlertManager for webhook notifications
+
+
+
+
+
   - Create alertmanager/alertmanager.yml with routing and receiver configuration
   - Configure Slack webhook integration with proper message formatting
   - Configure Discord webhook integration with proper message formatting
