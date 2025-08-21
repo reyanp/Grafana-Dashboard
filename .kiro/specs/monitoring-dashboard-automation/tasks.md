@@ -122,7 +122,12 @@
   - Set up alert grouping, timing, and repeat intervals
   - _Requirements: 4.5, 5.5, 5.6_
 
-- [ ] 10. Set up Grafana with datasource and dashboards
+- [x] 10. Set up Grafana with datasource and dashboards
+
+
+
+
+
   - Create grafana/provisioning/datasource.yml to configure Prometheus datasource
   - Configure Grafana to start with Prometheus connection
   - Create grafana/provisioning/dashboard.json with all required panels
@@ -130,7 +135,12 @@
   - Implement Node CPU/Memory, Probe Status, Top Routes, and Alert History panels
   - _Requirements: 4.4, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8_
 
-- [ ] 11. Configure Blackbox Exporter for uptime probes
+- [x] 11. Configure Blackbox Exporter for uptime probes
+
+
+
+
+
   - Create blackbox/blackbox.yml with HTTP probe configuration
   - Configure probes for application health endpoint and external targets
   - Set up Prometheus to scrape blackbox exporter metrics
