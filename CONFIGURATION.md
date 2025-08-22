@@ -49,8 +49,8 @@ ENVIRONMENT=development          # Environment identifier
 
 ```bash
 # Alert notification webhooks
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR/DISCORD/WEBHOOK
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123456789012345678/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 **SLACK_WEBHOOK_URL**: Slack incoming webhook URL for alert notifications.
@@ -59,7 +59,7 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR/DISCORD/WEBHOOK
 - Optional: Leave empty to disable Slack notifications
 
 **DISCORD_WEBHOOK_URL**: Discord webhook URL for alert notifications.
-- Format: `https://discord.com/api/webhooks/123456789/abcdefghijklmnopqrstuvwxyz`
+- Format: `https://discord.com/api/webhooks/123456789012345678/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
 - Setup: Server Settings > Integrations > Webhooks > New Webhook
 - Optional: Leave empty to disable Discord notifications
 
@@ -379,7 +379,7 @@ groups:
 
 2. **Configure Webhook URL**:
    ```bash
-   export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/123456789/abcdefghijklmnopqrstuvwxyz"
+   export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/123456789012345678/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
    ```
 
 ### Custom Webhook Payload
