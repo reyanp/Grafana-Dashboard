@@ -1,0 +1,89 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Environment files (contains sensitive data)
+.env
+.env.local
+.env.*.local
+
+# Load test results
+load-test-results/
+*.json.results
+*.txt.results
+
+# Logs
+*.log
+logs/
+
+# Docker volumes data (if accidentally created locally)
+prometheus_data/
+grafana_data/
+alertmanager_data/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Kiro IDE files
+.kiro/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific
+*.bat.bak
+*.cmd.bak
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Coverage reports
+coverage.txt
+coverage.html
+coverage.out
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Local configuration overrides
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Screenshots (until they're actually added)
+docs/screenshots/*.png
+docs/screenshots/*.jpg
+docs/screenshots/*.jpeg
+docs/screenshots/*.gif
+!docs/screenshots/README.md
