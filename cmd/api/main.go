@@ -61,12 +61,72 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Attempt graceful shutdown
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Fatal("Server forced to shutdown", zap.Error(err))
+	// Perform graceful shutdown
+	if err := gracefulShutdown(ctx, server, metricsRegistry, logger); err != nil {
+		logger.Error("Graceful shutdown failed", zap.Error(err))
+		os.Exit(1)
 	}
 
-	logger.Info("Server exited")
+	logger.Info("Server exited gracefully")
+}
+
+// gracefulShutdown handles the graceful shutdown process
+func gracefulShutdown(ctx context.Context, server *http.Server, metricsRegistry *metrics.Registry, logger *zap.Logger) error {
+	// Start shutdown process
+	shutdownComplete := make(chan error, 1)
+	
+	go func() {
+		// Wait for in-flight work jobs to complete
+		logger.Info("Waiting for in-flight work jobs to complete...")
+		
+		// Check for in-flight jobs periodically
+		ticker := time.NewTicker(1 * time.Second)
+		defer ticker.Stop()
+		
+		for {
+			select {
+			case <-ctx.Done():
+				// Timeout reached, force shutdown
+				shutdownComplete <- ctx.Err()
+				return
+			case <-ticker.C:
+				inflightJobs := metricsRegistry.GetInflightJobs()
+				if inflightJobs == 0 {
+					logger.Info("All work jobs completed")
+					break
+				}
+				logger.Info("Waiting for work jobs to complete", zap.Float64("inflight_jobs", inflightJobs))
+			}
+			
+			// Break out of the for loop when no inflight jobs
+			if metricsRegistry.GetInflightJobs() == 0 {
+				break
+			}
+		}
+		
+		// Shutdown HTTP server
+		logger.Info("Shutting down HTTP server...")
+		if err := server.Shutdown(ctx); err != nil {
+			shutdownComplete <- err
+			return
+		}
+		
+		// Flush metrics
+		logger.Info("Flushing metrics...")
+		if err := metricsRegistry.Flush(); err != nil {
+			logger.Warn("Failed to flush metrics", zap.Error(err))
+		}
+		
+		shutdownComplete <- nil
+	}()
+	
+	// Wait for shutdown to complete or timeout
+	select {
+	case err := <-shutdownComplete:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 func initLogger(level string) (*zap.Logger, error) {

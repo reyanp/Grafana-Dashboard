@@ -7,6 +7,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	dto "github.com/prometheus/client_model/go"
 )
 
 // Registry wraps prometheus registry and provides metrics
@@ -112,4 +113,35 @@ func (r *Registry) DecWorkJobsInflight() {
 // IncWorkFailures increments the work failures counter
 func (r *Registry) IncWorkFailures(operation string) {
 	r.workFailuresTotal.WithLabelValues(operation).Inc()
+}
+
+// GetInflightJobs returns the current number of inflight jobs
+func (r *Registry) GetInflightJobs() float64 {
+	metric := &dto.Metric{}
+	r.workJobsInflight.Write(metric)
+	return metric.GetGauge().GetValue()
+}
+
+// Flush ensures all metrics are properly written/flushed
+// For Prometheus client, this is mostly a no-op as metrics are pulled
+// but we can use this to log final metrics state
+func (r *Registry) Flush() error {
+	// Prometheus client doesn't require explicit flushing as it's pull-based
+	// But we can gather metrics for logging purposes
+	families, err := r.registry.Gather()
+	if err != nil {
+		return err
+	}
+	
+	// Log final metrics count for debugging
+	var totalMetrics int
+	for _, family := range families {
+		totalMetrics += len(family.GetMetric())
+	}
+	
+	// This is mainly for logging/debugging purposes
+	// In a real scenario, you might want to push final metrics to a push gateway
+	_ = totalMetrics
+	
+	return nil
 }

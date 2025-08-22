@@ -119,3 +119,61 @@ func TestGoMetrics(t *testing.T) {
 		t.Error("Expected process_resident_memory_bytes metric to be present")
 	}
 }
+
+func TestGetInflightJobs(t *testing.T) {
+	registry := NewRegistry()
+	
+	// Initially should be 0
+	if jobs := registry.GetInflightJobs(); jobs != 0 {
+		t.Errorf("Expected 0 inflight jobs, got %f", jobs)
+	}
+	
+	// Increment and check
+	registry.IncWorkJobsInflight()
+	if jobs := registry.GetInflightJobs(); jobs != 1 {
+		t.Errorf("Expected 1 inflight job, got %f", jobs)
+	}
+	
+	// Increment again and check
+	registry.IncWorkJobsInflight()
+	if jobs := registry.GetInflightJobs(); jobs != 2 {
+		t.Errorf("Expected 2 inflight jobs, got %f", jobs)
+	}
+	
+	// Decrement and check
+	registry.DecWorkJobsInflight()
+	if jobs := registry.GetInflightJobs(); jobs != 1 {
+		t.Errorf("Expected 1 inflight job, got %f", jobs)
+	}
+	
+	// Decrement to 0 and check
+	registry.DecWorkJobsInflight()
+	if jobs := registry.GetInflightJobs(); jobs != 0 {
+		t.Errorf("Expected 0 inflight jobs, got %f", jobs)
+	}
+}
+
+func TestFlush(t *testing.T) {
+	registry := NewRegistry()
+	
+	// Record some metrics
+	registry.RecordHTTPRequest("GET", "/test", 200, 100*time.Millisecond)
+	registry.IncWorkJobsInflight()
+	registry.IncWorkFailures("test_operation")
+	
+	// Test flush - should not return error
+	err := registry.Flush()
+	if err != nil {
+		t.Errorf("Flush() returned error: %v", err)
+	}
+	
+	// Verify metrics are still accessible after flush
+	families, err := registry.GetRegistry().Gather()
+	if err != nil {
+		t.Fatalf("Failed to gather metrics after flush: %v", err)
+	}
+	
+	if len(families) == 0 {
+		t.Error("Expected metrics to still be available after flush")
+	}
+}
