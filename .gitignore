@@ -24,6 +24,8 @@ go.work
 .env.local
 .env.*.local
 
+# Note: .env.example contains only placeholder/example URLs - no real secrets
+
 # Load test results
 load-test-results/
 *.json.results

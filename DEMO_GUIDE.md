@@ -305,12 +305,12 @@ To receive actual notifications during the demo:
 
 1. **Set up Slack webhook**:
    ```bash
-   export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+   export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
    ```
 
 2. **Set up Discord webhook**:
    ```bash
-   export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/123456789012345678/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+   export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/YOUR/DISCORD/WEBHOOK"
    ```
 
 3. **Restart AlertManager**:

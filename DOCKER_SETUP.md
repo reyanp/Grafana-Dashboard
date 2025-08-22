@@ -24,8 +24,8 @@ This directory contains a complete monitoring stack using Docker Compose with th
 2. Edit `.env` file with your webhook URLs:
    ```bash
    # Update these with your actual webhook URLs
-   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX
-   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123456789012345678/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
+   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR/DISCORD/WEBHOOK
    ```
 
 3. Start the stack:
